@@ -2,6 +2,7 @@ import { GetServerSideProps } from "next";
 import styles from "./styles.module.css";
 import Head from "next/head";
 import { getSession } from "next-auth/react";
+import { TextArea } from "../../components/textArea";
 
 export default function Dashboard() {
   return (
@@ -10,7 +11,24 @@ export default function Dashboard() {
         <title> Meu painel de tarefas</title>
       </Head>
 
-      <h1>Página Painel</h1>
+      <main className={styles.main}>
+        <section className={styles.content}>
+          <div className={styles.contentForm}>
+            <h1 className={styles.title}>Qual sua tarefa?</h1>
+
+            <form action="">
+              <TextArea placeholder="Digite qual sua tarefa..." />
+              <div className={styles.checkboxArea}>
+                <input type="checkbox" className={styles.checkbox} />
+                <label>Deixar tarefa pública?</label>
+              </div>
+              <button type="submit" className={styles.button}>
+                Registrar
+              </button>
+            </form>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }
