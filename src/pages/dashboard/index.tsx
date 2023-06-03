@@ -7,20 +7,37 @@ import { FiShare2 } from "react-icons/fi";
 import { FaTrash } from "react-icons/fa";
 import { ChangeEvent, FormEvent, useState } from "react";
 
-export default function Dashboard() {
-  const [input, setinput] = useState("");
+import { db } from "../../services/firebaseConnection";
+import { addDoc, collection } from "firebase/firestore";
+
+import { HomeProps } from "../../interface/IDashboard";
+
+export default function Dashboard({ user }: HomeProps) {
+  const [input, setInput] = useState("");
   const [publicTask, setPublicTask] = useState(false);
 
   function handleChangePublic(event: ChangeEvent<HTMLInputElement>) {
     setPublicTask(event.target.checked);
   }
 
-  function handleRegisterTask(event: FormEvent) {
+  async function handleRegisterTask(event: FormEvent) {
     event.preventDefault();
 
     if (input === "") return;
 
-    alert("Teste alert!");
+    try {
+      await addDoc(collection(db, "tarefas"), {
+        tarefa: input,
+        created: new Date(),
+        user: user?.email,
+        public: publicTask,
+      });
+
+      setInput("");
+      setPublicTask(false);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   return (
@@ -39,7 +56,7 @@ export default function Dashboard() {
                 placeholder="Digite qual sua tarefa..."
                 value={input}
                 onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
-                  setinput(event.target.value)
+                  setInput(event.target.value)
                 }
               />
               <div className={styles.checkboxArea}>
@@ -93,6 +110,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   }
 
   return {
-    props: {},
+    props: {
+      user: {
+        email: session?.user?.email,
+      },
+    },
   };
 };
