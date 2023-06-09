@@ -87,6 +87,8 @@ export default function Dashboard({ user }: HomeProps) {
     await navigator.clipboard.writeText(
       `${process.env.NEXT_PUBLIC_URL}/task/${id}`
     );
+
+    alert("URL Copiada com sucesso!");
   }
 
   async function handleDeleteTask(id: string) {
@@ -155,7 +157,10 @@ export default function Dashboard({ user }: HomeProps) {
                   <p>{item.tarefa}</p>
                 )}
 
-                <button className={styles.trashButton}>
+                <button
+                  className={styles.trashButton}
+                  onClick={() => handleDeleteTask(item.id)}
+                >
                   <FaTrash size={24} color="#ea3140" />
                 </button>
               </div>
