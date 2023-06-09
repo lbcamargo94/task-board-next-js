@@ -6,7 +6,7 @@ export interface HomeProps {
 
 export interface TaskProps {
   id: string;
-  createdAt: Date;
+  created: Date;
   public: boolean;
   tarefa: string;
   user: string;

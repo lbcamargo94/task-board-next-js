@@ -16,21 +16,24 @@ import {
   where,
   onSnapshot,
   doc,
+  deleteDoc,
 } from "firebase/firestore";
+
+import Link from "next/link";
 
 import { HomeProps, TaskProps } from "../../interface/IDashboard";
 
 export default function Dashboard({ user }: HomeProps) {
   const [input, setInput] = useState("");
   const [publicTask, setPublicTask] = useState(false);
-  const [task, setTask] = useState<TaskProps[]>([]);
+  const [tasks, setTasks] = useState<TaskProps[]>([]);
 
   useEffect(() => {
     async function loadTarefas() {
       const tarefasRef = collection(db, "tarefas");
       const _query = query(
         tarefasRef,
-        orderBy("createdAt", "desc"),
+        orderBy("created", "desc"),
         where("user", "==", user?.email)
       );
 
@@ -43,13 +46,13 @@ export default function Dashboard({ user }: HomeProps) {
           lista.push({
             id: doc.id,
             tarefa: doc.data().tarefa,
-            createdAt: doc.data().createdAt,
+            created: doc.data().created,
             user: doc.data().user,
             public: doc.data().public,
           });
         });
 
-        setTask(lista);
+        setTasks(lista);
       });
     }
 
@@ -78,6 +81,17 @@ export default function Dashboard({ user }: HomeProps) {
     } catch (err) {
       console.log(err);
     }
+  }
+
+  async function handleShare(id: string) {
+    await navigator.clipboard.writeText(
+      `${process.env.NEXT_PUBLIC_URL}/task/${id}`
+    );
+  }
+
+  async function handleDeleteTask(id: string) {
+    const docRef = doc(db, "tarefas", id);
+    await deleteDoc(docRef);
   }
 
   return (
@@ -117,21 +131,36 @@ export default function Dashboard({ user }: HomeProps) {
 
         <section className={styles.taskContainer}>
           <h1>Minhas Tarefas</h1>
-          <article className={styles.task}>
-            <div className={styles.tagContainer}>
-              <label className={styles.tag}>PUBLICO</label>
-              <button className={styles.shareButton}>
-                <FiShare2 size={22} color="#3183ff" />
-              </button>
-            </div>
 
-            <div className={styles.taskContent}>
-              <p>Minha primeira tarefa de exemplo show de mais</p>
-              <button className={styles.trashButton}>
-                <FaTrash size={24} color="#ea3140" />
-              </button>
-            </div>
-          </article>
+          {tasks.map((item) => (
+            <article key={item.id} className={styles.task}>
+              {item.public && (
+                <div className={styles.tagContainer}>
+                  <label className={styles.tag}>PUBLICO</label>
+                  <button
+                    className={styles.shareButton}
+                    onClick={() => handleShare(item.id)}
+                  >
+                    <FiShare2 size={22} color="#3183ff" />
+                  </button>
+                </div>
+              )}
+
+              <div className={styles.taskContent}>
+                {item.public ? (
+                  <Link href={`/task/${item.id}`}>
+                    <p>{item.tarefa}</p>
+                  </Link>
+                ) : (
+                  <p>{item.tarefa}</p>
+                )}
+
+                <button className={styles.trashButton}>
+                  <FaTrash size={24} color="#ea3140" />
+                </button>
+              </div>
+            </article>
+          ))}
         </section>
       </main>
     </div>
