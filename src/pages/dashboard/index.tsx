@@ -8,7 +8,14 @@ import { FaTrash } from "react-icons/fa";
 import { ChangeEvent, FormEvent, useState } from "react";
 
 import { db } from "../../services/firebaseConnection";
-import { addDoc, collection } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  query,
+  orderBy,
+  where,
+  onSnapshot,
+} from "firebase/firestore";
 
 import { HomeProps } from "../../interface/IDashboard";
 
