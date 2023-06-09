@@ -5,7 +5,7 @@ import { getSession } from "next-auth/react";
 import { TextArea } from "../../components/textArea";
 import { FiShare2 } from "react-icons/fi";
 import { FaTrash } from "react-icons/fa";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 
 import { db } from "../../services/firebaseConnection";
 import {
@@ -15,13 +15,46 @@ import {
   orderBy,
   where,
   onSnapshot,
+  doc,
 } from "firebase/firestore";
 
-import { HomeProps } from "../../interface/IDashboard";
+import { HomeProps, TaskProps } from "../../interface/IDashboard";
 
 export default function Dashboard({ user }: HomeProps) {
   const [input, setInput] = useState("");
   const [publicTask, setPublicTask] = useState(false);
+  const [task, setTask] = useState<TaskProps[]>([]);
+
+  useEffect(() => {
+    async function loadTarefas() {
+      const tarefasRef = collection(db, "tarefas");
+      const _query = query(
+        tarefasRef,
+        orderBy("createdAt", "desc"),
+        where("user", "==", user?.email)
+      );
+
+      onSnapshot(_query, (snapshot) => {
+        console.log(snapshot);
+
+        let lista = [] as TaskProps[];
+
+        snapshot.forEach((doc) => {
+          lista.push({
+            id: doc.id,
+            tarefa: doc.data().tarefa,
+            createdAt: doc.data().createdAt,
+            user: doc.data().user,
+            public: doc.data().public,
+          });
+        });
+
+        setTask(lista);
+      });
+    }
+
+    loadTarefas();
+  }, [user?.email]);
 
   function handleChangePublic(event: ChangeEvent<HTMLInputElement>) {
     setPublicTask(event.target.checked);
