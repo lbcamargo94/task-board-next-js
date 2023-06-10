@@ -3,17 +3,31 @@ import Head from "next/head";
 import styles from "./styles.module.css";
 import { db } from "@/services/firebaseConnection";
 import { doc, collection, query, where, getDoc } from "firebase/firestore";
+import { ITaskProps } from "@/interface/ITask";
+import { TextArea } from "@/components/textArea";
 
-export default function Task() {
+export default function Task({ item }: ITaskProps) {
   return (
     <div className={styles.container}>
       <Head>
-        <title>Detalhes da tarefa</title>
+        <title>Tarefa - Detalhes da tarefa</title>
       </Head>
 
       <main className={styles.main}>
         <h1>Tarefa</h1>
+        <article className={styles.task}>
+          <p>{item.tarefa}</p>
+        </article>
       </main>
+
+      <section className={styles.commentsContainer}>
+        <h2>Deixar comentário</h2>
+
+        <form>
+          <TextArea placeholder="Digite seu comentário..." />
+          <button className={styles.button}>Enviar comentário</button>
+        </form>
+      </section>
     </div>
   );
 }
@@ -21,14 +35,14 @@ export default function Task() {
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const id = params?.id as string;
 
-  const docRef = doc(db, "tarefa", id);
+  const docRef = doc(db, "tarefas", id);
 
   const snapshot = await getDoc(docRef);
 
   if (snapshot.data() === undefined) {
     return {
       redirect: {
-        destination: "/",
+        destination: "/dashboard",
         permanent: false,
       },
     };
@@ -37,7 +51,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   if (!snapshot.data()?.public) {
     return {
       redirect: {
-        destination: "/",
+        destination: "/dashboard",
         permanent: false,
       },
     };
@@ -56,6 +70,8 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   console.log(task);
 
   return {
-    props: {},
+    props: {
+      item: task,
+    },
   };
 };

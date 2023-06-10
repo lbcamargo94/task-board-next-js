@@ -1,4 +1,4 @@
-export interface TaskProps {
+export interface ITaskProps {
   item: {
     tarefa: string;
     created: string;
