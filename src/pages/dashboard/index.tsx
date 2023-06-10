@@ -21,12 +21,12 @@ import {
 
 import Link from "next/link";
 
-import { HomeProps, TaskProps } from "../../interface/IDashboard";
+import { IHomeProps, ITaskProps } from "../../interface/IDashboard";
 
-export default function Dashboard({ user }: HomeProps) {
+export default function Dashboard({ user }: IHomeProps) {
   const [input, setInput] = useState("");
   const [publicTask, setPublicTask] = useState(false);
-  const [tasks, setTasks] = useState<TaskProps[]>([]);
+  const [tasks, setTasks] = useState<ITaskProps[]>([]);
 
   useEffect(() => {
     async function loadTarefas() {
@@ -40,7 +40,7 @@ export default function Dashboard({ user }: HomeProps) {
       onSnapshot(_query, (snapshot) => {
         console.log(snapshot);
 
-        let lista = [] as TaskProps[];
+        let lista = [] as ITaskProps[];
 
         snapshot.forEach((doc) => {
           lista.push({

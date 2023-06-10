@@ -1,10 +1,10 @@
-export interface HomeProps {
+export interface IHomeProps {
   user: {
     email: string;
   };
 }
 
-export interface TaskProps {
+export interface ITaskProps {
   id: string;
   created: Date;
   public: boolean;
